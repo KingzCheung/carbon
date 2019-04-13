@@ -1,0 +1,11 @@
+language: go
+go:
+  - 1.12.x
+env:
+  - GO111MODULE=on
+
+install:
+  - go get -v golang.org/x/lint/golint
+script:
+  - golint -set_exit_status ./...
+  - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
