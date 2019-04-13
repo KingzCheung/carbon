@@ -44,7 +44,11 @@ func TestCarbon_Timestamp(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	as := assert.New(t)
-	c := Create(2018, 10, 22, 12, 12, 12, 10, time.Local)
+	tz, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		as.Error(err)
+	}
+	c := Create(2018, 10, 22, 12, 12, 12, 10, tz)
 	as.Equal(c.Timestamp(), int64(1540181532), "Create parse error. Timestamp should be equal 1540181532")
 }
 
