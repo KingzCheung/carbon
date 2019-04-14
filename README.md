@@ -1,6 +1,6 @@
 # Carbon
 
-![GitHub](https://img.shields.io/github/license/kingzcheung/carbon.svg)  [![godoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://github.com/KingzCheung/carbon)  [![Build Status](https://travis-ci.org/KingzCheung/carbon.svg?branch=master)](https://travis-ci.org/KingzCheung/carbon)
+![GitHub](https://img.shields.io/github/license/kingzcheung/carbon.svg)  [![godoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/KingzCheung/carbon)  [![Build Status](https://travis-ci.org/KingzCheung/carbon.svg?branch=master)](https://travis-ci.org/KingzCheung/carbon)
 
 ### 安装
 
