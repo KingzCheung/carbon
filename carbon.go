@@ -128,8 +128,8 @@ func Yesterday() *Carbon {
 }
 
 //Create Create a new Carbon instance from a specific date and time.
-func Create(year, month, day, hour, minute, second, nanosecond int, tz *time.Location) *Carbon {
-	d := time.Date(year, time.Month(month), day, hour, minute, second, nanosecond, tz)
+func Create(year, month, day, hour, minute, second int, tz *time.Location) *Carbon {
+	d := time.Date(year, time.Month(month), day, hour, minute, second, 0, tz)
 	return &Carbon{
 		Year:        d.Year(),
 		Month:       d.Month(),
@@ -137,9 +137,9 @@ func Create(year, month, day, hour, minute, second, nanosecond int, tz *time.Loc
 		Hour:        d.Hour(),
 		Minute:      d.Minute(),
 		Second:      d.Second(),
-		Millisecond: d.Nanosecond() / 1000000,
-		Microsecond: d.Nanosecond() / 1000,
-		Nanosecond:  d.Nanosecond(),
+		Millisecond: 0,
+		Microsecond: 0,
+		Nanosecond:  0,
 		Week:        d.Weekday(),
 		time:        d,
 	}
@@ -562,6 +562,16 @@ func (c *Carbon) IsSaturday() bool {
 	return c.time.Weekday().String() == Saturday
 }
 
+//IsWeekend 判断是不是周末
+func (c *Carbon) IsWeekend() bool {
+	return c.IsSunday() || c.IsSaturday()
+}
+
+//IsWeekday 是否是工作日
+func (c *Carbon) IsWeekday() bool {
+	return !c.IsWeekend()
+}
+
 //IsCurrentYear 判断是不是今年
 func (c *Carbon) IsCurrentYear() bool {
 	curYear := Now().Format("01")
@@ -757,6 +767,7 @@ func (c *Carbon) String() string {
 	return c.ToDateTimeString()
 }
 
+//ToMap Conversion to Map
 func (c *Carbon) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"year":        c.Year,
@@ -770,4 +781,80 @@ func (c *Carbon) ToMap() map[string]interface{} {
 		"nanosecond":  c.Nanosecond,
 		"week":        c.Week,
 	}
+}
+
+//Comparison
+
+//EqualTo 比较两个时间是否一样
+func (c *Carbon) EqualTo(carbon *Carbon) bool {
+	if c.Year != carbon.Year {
+		return false
+	}
+	if c.Month != carbon.Month {
+		return false
+	}
+
+	if c.Day != carbon.Day {
+		return false
+	}
+
+	if c.Hour != carbon.Hour {
+		return false
+	}
+	if c.Minute != c.Minute {
+		return false
+	}
+
+	if c.Second != carbon.Second {
+		return false
+	}
+
+	if c.Millisecond != c.Millisecond {
+		return false
+	}
+
+	if c.Microsecond != carbon.Microsecond {
+		return false
+	}
+
+	if c.Nanosecond != carbon.Nanosecond {
+		return false
+	}
+
+	return true
+}
+
+//NotEqualTo 比较两个时间是否不一样
+func (c *Carbon) NotEqualTo(carbon *Carbon) bool {
+	//Todo
+	return true
+}
+
+//GreaterThan 比较时间是否比目标大
+func (c *Carbon) GreaterThan(carbon *Carbon) bool {
+	//Todo
+	return true
+}
+
+//GreaterThanOrEqualTo 比较时间是否比目标大于或者等于
+func (c *Carbon) GreaterThanOrEqualTo(carbon *Carbon) bool {
+	//Todo
+	return true
+}
+
+//LessThan 比较时间是否比目标小
+func (c *Carbon) LessThan(carbon *Carbon) bool {
+	//Todo
+	return true
+}
+
+//LessThanOrEqualTo 比较时间是否比目标小或者等于
+func (c *Carbon) LessThanOrEqualTo(carbon *Carbon) bool {
+	return true
+}
+
+//Between 比较当前值是否是在 first 和second 之间
+func (c *Carbon) Between(first, second *Carbon) bool {
+	//Todo
+	return true
 }

@@ -64,7 +64,7 @@ func TestCreate(t *testing.T) {
 	if err != nil {
 		as.Error(err)
 	}
-	c := Create(2018, 10, 22, 12, 12, 12, 10, tz)
+	c := Create(2018, 10, 22, 12, 12, 12, tz)
 	as.Equal(c.Timestamp(), int64(1540181532), "Create parse error. Timestamp should be equal 1540181532")
 }
 
@@ -193,6 +193,53 @@ func TestCreateFromTimestampString(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got.Year, tt.want.Year) {
 				t.Errorf("CreateFromTimestampString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCarbon_EqualTo(t *testing.T) {
+	type fields struct {
+		Year        int
+		Day         int
+		Hour        int
+		Minute      int
+		Second      int
+		Millisecond int
+		Microsecond int
+		Nanosecond  int
+		Month       time.Month
+		Week        time.Weekday
+		time        time.Time
+	}
+	type args struct {
+		carbon *Carbon
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   bool
+	}{
+		{"eq1", fields{Year: 2019, Day: 14, Hour: 20, Minute: 54, Second: 21, Microsecond: 0, Millisecond: 0, Nanosecond: 0, Month: time.Month(4)}, args{Create(2019, 4, 14, 20, 54, 21, time.Local)}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Carbon{
+				Year:        tt.fields.Year,
+				Day:         tt.fields.Day,
+				Hour:        tt.fields.Hour,
+				Minute:      tt.fields.Minute,
+				Second:      tt.fields.Second,
+				Millisecond: tt.fields.Millisecond,
+				Microsecond: tt.fields.Microsecond,
+				Nanosecond:  tt.fields.Nanosecond,
+				Month:       tt.fields.Month,
+				Week:        tt.fields.Week,
+				time:        tt.fields.time,
+			}
+			if got := c.EqualTo(tt.args.carbon); got != tt.want {
+				t.Errorf("Carbon.EqualTo() = %v, want %v", got, tt.want)
 			}
 		})
 	}
