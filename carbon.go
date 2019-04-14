@@ -7,42 +7,71 @@ import (
 	"time"
 )
 
+//Unit 单位类型
 type Unit int
 
 const (
+	//Year 年
 	Year Unit = iota
+	//Month 月
 	Month
+	//Day 日
 	Day
+	//Hour 时
 	Hour
+	//Minute 分
 	Minute
+	//Second 秒
 	Second
+	//Millisecond 微秒
 	Millisecond
+	//Nanosecond 纳秒
 	Nanosecond
+	//Week 周
 	Week
 )
 const (
+	//January 一月
 	January = 1 + iota
+	//February 二月
 	February
+	//March 三月
 	March
+	//April 四月
 	April
+	//May 五月
 	May
+	//June 六月
 	June
+	//July 七月
 	July
+	//August 八月
 	August
+	//September 九月
 	September
+	//October 十月
 	October
+	//November 十一月
 	November
+	//December 十二月
 	December
 )
 
 const (
-	Sunday    = "Sunday"
-	Monday    = "Monday"
-	Tuesday   = "Tuesday"
+	//Sunday 周日
+	Sunday = "Sunday"
+	//Monday 周一
+	Monday = "Monday"
+	//Tuesday 周二
+	Tuesday = "Tuesday"
+	//Wednesday 三
 	Wednesday = "Wednesday"
-	Thursday  = "Thursday"
-	Friday    = "Friday"
-	Saturday  = "Saturday"
+	//Thursday 四
+	Thursday = "Thursday"
+	//Friday 五
+	Friday = "Friday"
+	//Saturday 六
+	Saturday = "Saturday"
 )
 
 //Now 获取现在时刻时间
@@ -156,19 +185,19 @@ func CreateFromTimeString(value string, tz *time.Location) (*Carbon, error) {
 
 	v := strings.Split(value, ":")
 	if len(v) != 3 {
-		return &Carbon{}, TimeParseError
+		return &Carbon{}, ErrTimeParse
 	}
 	hour, err := strconv.Atoi(v[0])
 	if err != nil {
-		return &Carbon{}, TimeParseError
+		return &Carbon{}, ErrTimeParse
 	}
 	minute, err := strconv.Atoi(v[1])
 	if err != nil {
-		return &Carbon{}, TimeParseError
+		return &Carbon{}, ErrTimeParse
 	}
 	second, err := strconv.Atoi(v[2])
 	if err != nil {
-		return &Carbon{}, TimeParseError
+		return &Carbon{}, ErrTimeParse
 	}
 
 	return CreateFromTime(hour, minute, second, tz), nil
@@ -234,12 +263,12 @@ func CreateFromTimestamp(value int64) *Carbon {
 func CreateFromTimestampString(value string) (*Carbon, error) {
 	i, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
-		return &Carbon{}, TimestampParseError
+		return &Carbon{}, ErrTimestampParse
 	}
 	return CreateFromTimestamp(i), nil
 }
 
-//Carbon
+//Carbon 处理时间
 type Carbon struct {
 	Year, Day, Hour, Minute, Second, Millisecond, Nanosecond int
 	Month                                                    time.Month
@@ -269,9 +298,8 @@ func (c *Carbon) IsLeapYear() bool {
 func (c *Carbon) CountDayForYear() int {
 	if c.IsLeapYear() {
 		return 366
-	} else {
-		return 365
 	}
+	return 365
 }
 
 //CountDayForMonth 返回每个月的天数
