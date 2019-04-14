@@ -8,6 +8,8 @@ import (
 func main() {
 	//获取现在时间
 	now := carbon.Now()
+	// 返回toString
+	fmt.Println(now) //2019-04-14 16:09:20
 	//获取昨天时间
 	//yesterday := carbon.Yesterday()
 	//获取明天时间
@@ -18,4 +20,6 @@ func main() {
 	fmt.Println(now.Format("2006-01-02 15:04:05 pm"))
 	//解析时间
 	fmt.Println(carbon.Parse("2006-01-02 15:04:05", "2019-01-01 21:12:22").Format("2006-01-02 15:04:05 pm"))
+
+	fmt.Println(now.ToMap())
 }

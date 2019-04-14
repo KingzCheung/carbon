@@ -23,8 +23,10 @@ const (
 	Minute
 	//Second 秒
 	Second
-	//Millisecond 微秒
+	//Millisecond 毫秒
 	Millisecond
+	//Microsecond 微秒
+	Microsecond
 	//Nanosecond 纳秒
 	Nanosecond
 	//Week 周
@@ -84,7 +86,8 @@ func Now() *Carbon {
 		Hour:        t.Hour(),
 		Minute:      t.Minute(),
 		Second:      t.Second(),
-		Millisecond: t.Nanosecond() / 1000,
+		Millisecond: t.Nanosecond() / 1000000,
+		Microsecond: t.Nanosecond() / 1000,
 		Nanosecond:  t.Nanosecond(),
 		Week:        t.Weekday(),
 		time:        t,
@@ -103,6 +106,7 @@ func Today() *Carbon {
 		Minute:      0,
 		Second:      0,
 		Millisecond: 0,
+		Microsecond: 0,
 		Nanosecond:  0,
 		Week:        now.Week,
 		time:        date.time,
@@ -133,7 +137,8 @@ func Create(year, month, day, hour, minute, second, nanosecond int, tz *time.Loc
 		Hour:        d.Hour(),
 		Minute:      d.Minute(),
 		Second:      d.Second(),
-		Millisecond: d.Nanosecond() / 1000,
+		Millisecond: d.Nanosecond() / 1000000,
+		Microsecond: d.Nanosecond() / 1000,
 		Nanosecond:  d.Nanosecond(),
 		Week:        d.Weekday(),
 		time:        d,
@@ -153,7 +158,8 @@ func CreateFromDate(year, month, day int, tz *time.Location) *Carbon {
 		Hour:        date.Hour(),
 		Minute:      date.Minute(),
 		Second:      date.Second(),
-		Millisecond: date.Nanosecond() / 1000,
+		Millisecond: date.Nanosecond() / 1000000,
+		Microsecond: date.Nanosecond() / 1000,
 		Nanosecond:  date.Nanosecond(),
 		Week:        date.Weekday(),
 		time:        date,
@@ -173,7 +179,8 @@ func CreateFromTime(hour, minute, second int, tz *time.Location) *Carbon {
 		Hour:        date.Hour(),
 		Minute:      date.Minute(),
 		Second:      date.Second(),
-		Millisecond: date.Nanosecond() / 1000,
+		Millisecond: date.Nanosecond() / 1000000,
+		Microsecond: date.Nanosecond() / 1000,
 		Nanosecond:  date.Nanosecond(),
 		Week:        date.Weekday(),
 		time:        date,
@@ -213,7 +220,8 @@ func Parse(layout, value string) *Carbon {
 		Hour:        parse.Hour(),
 		Minute:      parse.Minute(),
 		Second:      parse.Second(),
-		Millisecond: parse.Nanosecond() / 1000,
+		Millisecond: parse.Nanosecond() / 1000000,
+		Microsecond: parse.Nanosecond() / 1000,
 		Nanosecond:  parse.Nanosecond(),
 		Week:        parse.Weekday(),
 		time:        parse,
@@ -230,7 +238,8 @@ func ParseFromLocale(layout, value string, tz *time.Location) *Carbon {
 		Hour:        parse.Hour(),
 		Minute:      parse.Minute(),
 		Second:      parse.Second(),
-		Millisecond: parse.Nanosecond() / 1000,
+		Millisecond: parse.Nanosecond() / 1000000,
+		Microsecond: parse.Nanosecond() / 1000,
 		Nanosecond:  parse.Nanosecond(),
 		Week:        parse.Weekday(),
 		time:        parse,
@@ -252,7 +261,8 @@ func CreateFromTimestamp(value int64) *Carbon {
 		Hour:        t.Hour(),
 		Minute:      t.Minute(),
 		Second:      t.Second(),
-		Millisecond: t.Nanosecond() / 1000,
+		Millisecond: t.Nanosecond() / 1000000,
+		Microsecond: t.Nanosecond() / 1000,
 		Nanosecond:  t.Nanosecond(),
 		Week:        t.Weekday(),
 		time:        t,
@@ -270,10 +280,10 @@ func CreateFromTimestampString(value string) (*Carbon, error) {
 
 //Carbon 处理时间
 type Carbon struct {
-	Year, Day, Hour, Minute, Second, Millisecond, Nanosecond int
-	Month                                                    time.Month
-	Week                                                     time.Weekday
-	time                                                     time.Time
+	Year, Day, Hour, Minute, Second, Millisecond, Microsecond, Nanosecond int
+	Month                                                                 time.Month
+	Week                                                                  time.Weekday
+	time                                                                  time.Time
 }
 
 //Format 通过时间格式指定格式化时间并返回
@@ -312,9 +322,8 @@ func (c *Carbon) CountDayForMonth() int {
 	case February:
 		if c.IsLeapYear() {
 			return 29
-		} else {
-			return 28
 		}
+		return 28
 	case April, June, September, November:
 		return 30
 	default:
@@ -723,4 +732,42 @@ func (c *Carbon) IsLastQuarter() bool {
 func (c *Carbon) ToDateTimeString() string {
 	layout := "2006-01-02 15:04:05"
 	return c.Format(layout)
+}
+
+//ToDateString 返回日期时间字符串
+func (c *Carbon) ToDateString() string {
+	layout := "2006-01-02"
+	return c.Format(layout)
+}
+
+//ToTimeString 返回时间字符串
+func (c *Carbon) ToTimeString() string {
+	layout := "15:04:05"
+	return c.Format(layout)
+}
+
+//ToFormattedDateString 返回格式化可读性的日期
+func (c *Carbon) ToFormattedDateString() string {
+	layout := "Jan 02,2006"
+	return c.Format(layout)
+}
+
+//String as same as ToDateTimeString
+func (c *Carbon) String() string {
+	return c.ToDateTimeString()
+}
+
+func (c *Carbon) ToMap() map[string]interface{} {
+	return map[string]interface{}{
+		"year":        c.Year,
+		"month":       c.Month,
+		"day":         c.Day,
+		"hour":        c.Hour,
+		"minute":      c.Minute,
+		"second":      c.Second,
+		"millisecond": c.Millisecond,
+		"microsecond": c.Microsecond,
+		"nanosecond":  c.Nanosecond,
+		"week":        c.Week,
+	}
 }
