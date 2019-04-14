@@ -3,11 +3,11 @@ package carbon
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Unit int
-type Quarter int8
 
 const (
 	Year Unit = iota
@@ -62,17 +62,22 @@ func Now() *Carbon {
 	}
 }
 
-func (q Quarter) Next() Quarter {
-	if q == 4 {
-		return 1
+//Today 获取今天日期,时间重置为0时0分0秒
+func Today() *Carbon {
+	now := Now()
+	date := CreateFromDate(now.Year, int(now.Month), now.Day, time.Local)
+	return &Carbon{
+		Year:        now.Year,
+		Month:       now.Month,
+		Day:         now.Day,
+		Hour:        0,
+		Minute:      0,
+		Second:      0,
+		Millisecond: 0,
+		Nanosecond:  0,
+		Week:        now.Week,
+		time:        date.time,
 	}
-	return q + 1
-}
-func (q Quarter) Last() Quarter {
-	if q == 1 {
-		return 4
-	}
-	return q - 1
 }
 
 // Tomorrow 获取明天的时间
@@ -146,6 +151,30 @@ func CreateFromTime(hour, minute, second int, tz *time.Location) *Carbon {
 	}
 }
 
+//CreateFromTimeString 解析冒号过来的时间字符串
+func CreateFromTimeString(value string, tz *time.Location) (*Carbon, error) {
+
+	v := strings.Split(value, ":")
+	if len(v) != 3 {
+		return &Carbon{}, TimeParseError
+	}
+	hour, err := strconv.Atoi(v[0])
+	if err != nil {
+		return &Carbon{}, TimeParseError
+	}
+	minute, err := strconv.Atoi(v[1])
+	if err != nil {
+		return &Carbon{}, TimeParseError
+	}
+	second, err := strconv.Atoi(v[2])
+	if err != nil {
+		return &Carbon{}, TimeParseError
+	}
+
+	return CreateFromTime(hour, minute, second, tz), nil
+}
+
+//Parse 通过格式化解析时间字符串为 Carbon 类型
 func Parse(layout, value string) *Carbon {
 	parse, _ := time.Parse(layout, value)
 	return &Carbon{
@@ -162,6 +191,7 @@ func Parse(layout, value string) *Carbon {
 	}
 }
 
+//ParseFromLocale 基于时区解析时间字符串为 Carbon 类型
 func ParseFromLocale(layout, value string, tz *time.Location) *Carbon {
 	parse, _ := time.ParseInLocation(layout, value, tz)
 	return &Carbon{
@@ -178,6 +208,37 @@ func ParseFromLocale(layout, value string, tz *time.Location) *Carbon {
 	}
 }
 
+//CreateFromFormat as same as ParseFromLocale.
+func CreateFromFormat(layout, value string, tz *time.Location) *Carbon {
+	return ParseFromLocale(layout, value, tz)
+}
+
+//CreateFromTimestamp 从时间戳中解析 Carbon
+func CreateFromTimestamp(value int64) *Carbon {
+	t := time.Unix(value, 0)
+	return &Carbon{
+		Year:        t.Year(),
+		Month:       t.Month(),
+		Day:         t.Day(),
+		Hour:        t.Hour(),
+		Minute:      t.Minute(),
+		Second:      t.Second(),
+		Millisecond: t.Nanosecond() / 1000,
+		Nanosecond:  t.Nanosecond(),
+		Week:        t.Weekday(),
+		time:        t,
+	}
+}
+
+//CreateFromTimestampString 同 CreateFromTimestamp 类似，只不过参数为时间戳字符串，并返回解析错误
+func CreateFromTimestampString(value string) (*Carbon, error) {
+	i, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return &Carbon{}, TimestampParseError
+	}
+	return CreateFromTimestamp(i), nil
+}
+
 //Carbon
 type Carbon struct {
 	Year, Day, Hour, Minute, Second, Millisecond, Nanosecond int
@@ -186,20 +247,25 @@ type Carbon struct {
 	time                                                     time.Time
 }
 
+//Format 通过时间格式指定格式化时间并返回
 func (c *Carbon) Format(layout string) string {
 	return c.time.Format(layout)
 }
 
-//Timestamp 获取时间戳
+//Unix 获取时间戳
 func (c *Carbon) Unix() int64 { return c.time.Unix() }
+
+//Timestamp 同 Unix 获取时间戳
 func (c *Carbon) Timestamp() int64 {
 	return c.time.Unix()
 }
 
+//IsLeapYear 判断是不是闰年
 func (c *Carbon) IsLeapYear() bool {
 	return (c.Year%100 != 0 && c.Year%4 == 0) || (c.Year%400 == 0)
 }
 
+//CountDayForYear 返回一年的天数，如果是闰年则返回366天
 func (c *Carbon) CountDayForYear() int {
 	if c.IsLeapYear() {
 		return 366
@@ -269,6 +335,7 @@ func (c *Carbon) Add(unit Unit, value int) *Carbon {
 	_ = c.addValToUnit(unit, value)
 	return c
 }
+
 func (c *Carbon) subValToUnit(unit Unit, value int) error {
 	switch unit {
 	case Year:
@@ -304,6 +371,7 @@ func (c *Carbon) subValToUnit(unit Unit, value int) error {
 	return nil
 }
 
+//Sub 从当前结构体减去 value 的 unit
 func (c *Carbon) Sub(unit Unit, value int) *Carbon {
 	_ = c.subValToUnit(unit, value)
 	return c
@@ -331,10 +399,12 @@ func (c *Carbon) AddMonths(value int) *Carbon {
 	return c.Add(Month, value)
 }
 
+//AddWeek 从当前结构体加上 1 周
 func (c *Carbon) AddWeek() *Carbon {
 	return c.Add(Week, 1)
 }
 
+//AddWeeks 从当前结构体加上 value 周
 func (c *Carbon) AddWeeks(value int) *Carbon {
 	return c.Add(Week, value)
 }
@@ -344,14 +414,17 @@ func (c *Carbon) AddDay() *Carbon {
 	return c.Add(Day, 1)
 }
 
+//AddDays 从当前结构体加上 value 天
 func (c *Carbon) AddDays(value int) *Carbon {
 	return c.Add(Day, value)
 }
 
+//SubDay 从当前结构体减去 1 天
 func (c *Carbon) SubDay() *Carbon {
 	return c.Sub(Day, 1)
 }
 
+//SubDays 从当前结构体减去 value 天
 func (c *Carbon) SubDays(value int) *Carbon {
 	return c.Sub(Day, value)
 }
@@ -361,14 +434,17 @@ func (c *Carbon) AddHour() *Carbon {
 	return c.Add(Hour, 1)
 }
 
+//AddHours 从当前结构体加上 value 小时
 func (c *Carbon) AddHours(value int) *Carbon {
 	return c.Add(Hour, value)
 }
 
+//SubHour 从当前结构体减去 1 小时
 func (c *Carbon) SubHour() *Carbon {
 	return c.Sub(Hour, 1)
 }
 
+//SubHours 从当前结构体减去 value 小时
 func (c *Carbon) SubHours(value int) *Carbon {
 	return c.Sub(Hour, value)
 }
@@ -378,14 +454,17 @@ func (c *Carbon) AddMinute() *Carbon {
 	return c.Add(Minute, 1)
 }
 
+//AddMinutes 从当前结构体减去 value 分钟
 func (c *Carbon) AddMinutes(value int) *Carbon {
 	return c.Add(Minute, value)
 }
 
+//SubMinute 从当前结构体减去 1 分钟
 func (c *Carbon) SubMinute() *Carbon {
 	return c.Sub(Minute, 1)
 }
 
+//SubMinutes 从当前结构体减去 value 分钟
 func (c *Carbon) SubMinutes(value int) *Carbon {
 	return c.Sub(Minute, value)
 }
@@ -395,150 +474,193 @@ func (c *Carbon) AddSecond() *Carbon {
 	return c.Add(Second, 1)
 }
 
+//AddSeconds 从当前结构体加上 value 秒
 func (c *Carbon) AddSeconds(value int) *Carbon {
 	return c.Add(Second, value)
 }
 
+//SubSecond 从当前结构体减去 1 秒
 func (c *Carbon) SubSecond() *Carbon {
 	return c.Sub(Second, 1)
 }
 
+//SubSeconds 从当前结构体减去 value 秒
 func (c *Carbon) SubSeconds(value int) *Carbon {
 	return c.Sub(Second, value)
 }
 
-//is
-
-func (c *Carbon) IsSunday(value int) bool {
+//IsSunday 判断是不是周日
+func (c *Carbon) IsSunday() bool {
 	return c.time.Weekday().String() == Sunday
 
 }
-func (c *Carbon) IsMonday(value int) bool {
+
+//IsMonday 判断是不是周一
+func (c *Carbon) IsMonday() bool {
 	return c.time.Weekday().String() == Monday
 }
-func (c *Carbon) IsTuesday(value int) bool {
+
+//IsTuesday 判断是不是周二
+func (c *Carbon) IsTuesday() bool {
 	return c.time.Weekday().String() == Tuesday
 }
-func (c *Carbon) IsWednesday(value int) bool {
+
+//IsWednesday 判断是不是周三
+func (c *Carbon) IsWednesday() bool {
 	return c.time.Weekday().String() == Wednesday
 }
-func (c *Carbon) IsThursday(value int) bool {
+
+//IsThursday 判断是不是周四
+func (c *Carbon) IsThursday() bool {
 	return c.time.Weekday().String() == Thursday
 }
-func (c *Carbon) IsFriday(value int) bool {
+
+//IsFriday 判断是不是周五
+func (c *Carbon) IsFriday() bool {
 	return c.time.Weekday().String() == Friday
 }
-func (c *Carbon) IsSaturday(value int) bool {
+
+//IsSaturday 判断是不是周六
+func (c *Carbon) IsSaturday() bool {
 	return c.time.Weekday().String() == Saturday
 }
-func (c *Carbon) IsCurrentYear(value int) bool {
+
+//IsCurrentYear 判断是不是今年
+func (c *Carbon) IsCurrentYear() bool {
 	curYear := Now().Format("01")
 	return curYear == strconv.Itoa(c.Year)
 }
 
-func (c *Carbon) IsNextYear(value int) bool {
+//IsNextYear 判断是不是明天
+func (c *Carbon) IsNextYear() bool {
 	curYear := Now().Year
 	return c.Year-curYear == 1
 }
 
-func (c *Carbon) IsLastYear(value int) bool {
+//IsLastYear 判断是不是去年
+func (c *Carbon) IsLastYear() bool {
 	curYear := Now().Year
 	return curYear-c.Year == 1
 }
 
-func (c *Carbon) IsCurrentDay(value int) bool {
+//IsCurrentDay 判断是不是今天
+func (c *Carbon) IsCurrentDay() bool {
 	curDay := Now().Day
 	return curDay == c.Day
 }
 
-func (c *Carbon) IsNextDay(value int) bool {
+//IsNextDay 判断是不是明天
+func (c *Carbon) IsNextDay() bool {
 	curDay := Now().Day
 	return c.Day-curDay == 1
 }
-func (c *Carbon) IsLastDay(value int) bool {
+
+//IsLastDay 判断是不是昨天
+func (c *Carbon) IsLastDay() bool {
 	curDay := Now().Day
 	return curDay-c.Day == 1
 }
 
-func (c *Carbon) IsCurrentHour(value int) bool {
+//IsCurrentHour 判断是否是当前小时
+func (c *Carbon) IsCurrentHour() bool {
 	curHour := Now().Hour
 	return curHour == c.Hour
 }
 
-func (c *Carbon) IsNextHour(value int) bool {
+//IsNextHour 判断是否是下一小时
+func (c *Carbon) IsNextHour() bool {
 	curHour := Now().Hour
 
 	return c.Hour-curHour == 1
 }
-func (c *Carbon) IsLastHour(value int) bool {
+
+//IsLastHour 判断是否是上一小时
+func (c *Carbon) IsLastHour() bool {
 	curHour := Now().Hour
 
 	return curHour-c.Hour == 1
 }
 
-func (c *Carbon) IsCurrentWeek(value int) bool {
+//IsCurrentWeek 判断是不是当前周
+func (c *Carbon) IsCurrentWeek() bool {
 	curWeek := Now().Week
 
 	return curWeek == c.Week
 }
 
-func (c *Carbon) IsNextWeek(value int) bool {
+//IsNextWeek 判断是不是下周
+func (c *Carbon) IsNextWeek() bool {
 	curWeek := Now().Week
 	return c.Week-curWeek == 1
 }
-func (c *Carbon) IsLastWeek(value int) bool {
+
+//IsLastWeek 判断是否是上周
+func (c *Carbon) IsLastWeek() bool {
 	curWeek := Now().Week
 
 	return curWeek-c.Week == 1
 }
 
-func (c *Carbon) IsCurrentMinute(value int) bool {
+//IsCurrentMinute 判断是否是当前分钟
+func (c *Carbon) IsCurrentMinute() bool {
 	curMinute := Now().Minute
 	return curMinute == c.Minute
 }
 
-func (c *Carbon) IsNextMinute(value int) bool {
+//IsNextMinute 判断是否是下一分钟
+func (c *Carbon) IsNextMinute() bool {
 	curMinute := Now().Minute
 
 	return c.Minute-curMinute == 1
 }
-func (c *Carbon) IsLastMinute(value int) bool {
+
+//IsLastMinute 判断是否是上一分钟
+func (c *Carbon) IsLastMinute() bool {
 	curMinute := Now().Minute
 
 	return curMinute-c.Minute == 1
 }
 
-func (c *Carbon) IsCurrentSecond(value int) bool {
+//IsCurrentSecond 判断是否是当前秒
+func (c *Carbon) IsCurrentSecond() bool {
 	curSec := Now().Second
 	return curSec == c.Second
 }
 
-func (c *Carbon) IsNextSecond(value int) bool {
+//IsNextSecond 判断是否是下一秒
+func (c *Carbon) IsNextSecond() bool {
 	curSec := Now().Second
 
 	return c.Second-curSec == 1
 }
-func (c *Carbon) IsLastSecond(value int) bool {
+
+//IsLastSecond 判断是否是上一秒
+func (c *Carbon) IsLastSecond() bool {
 	curSec := Now().Second
 
 	return curSec-c.Second == 1
 }
 
-func (c *Carbon) IsCurrentMonth(value int) bool {
+//IsCurrentMonth 判断是否是当前月
+func (c *Carbon) IsCurrentMonth() bool {
 	curMonth := Now().Month
 	return curMonth == c.Month
 }
 
-func (c *Carbon) IsNextMonth(value int) bool {
+//IsNextMonth 判断是否是下一个月
+func (c *Carbon) IsNextMonth() bool {
 	curMonth := Now().Month
 	return c.Month-curMonth == 1
 }
-func (c *Carbon) IsLastMonth(value int) bool {
+
+//IsLastMonth 判断是否是上一个月
+func (c *Carbon) IsLastMonth() bool {
 	curMonth := Now().Month
 
 	return curMonth-c.Month == 1
 }
 
+//CurrentQuarter 返回当前季度
 func (c *Carbon) CurrentQuarter() Quarter {
 	switch {
 	case 1 <= c.Month && c.Month <= 3:
@@ -554,13 +676,23 @@ func (c *Carbon) CurrentQuarter() Quarter {
 	}
 }
 
+//IsCurrentQuarter 判断是否是当前季度
 func (c *Carbon) IsCurrentQuarter() bool {
 	return c.CurrentQuarter() == Now().CurrentQuarter()
 }
 
+//IsNextQuarter 判断是否是下一季度
 func (c *Carbon) IsNextQuarter() bool {
 	return c.CurrentQuarter() == Now().CurrentQuarter().Next()
 }
+
+//IsLastQuarter 判断是否是上一季度
 func (c *Carbon) IsLastQuarter() bool {
 	return c.CurrentQuarter() == Now().CurrentQuarter().Last()
+}
+
+//ToDateTimeString 返回 "2006-01-02 15:04:05" 时间格式的字符串
+func (c *Carbon) ToDateTimeString() string {
+	layout := "2006-01-02 15:04:05"
+	return c.Format(layout)
 }
