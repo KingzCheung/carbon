@@ -787,269 +787,58 @@ func (c *Carbon) ToMap() map[string]interface{} {
 
 //EqualTo 比较两个时间是否一样
 func (c *Carbon) EqualTo(carbon *Carbon) bool {
-	if c.Year != carbon.Year {
-		return false
+	if c.Timestamp() == carbon.Timestamp() {
+		return true
 	}
-	if c.Month != carbon.Month {
-		return false
-	}
-
-	if c.Day != carbon.Day {
-		return false
-	}
-
-	if c.Hour != carbon.Hour {
-		return false
-	}
-	if c.Minute != c.Minute {
-		return false
-	}
-
-	if c.Second != carbon.Second {
-		return false
-	}
-
-	if c.Millisecond != c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond != carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond != carbon.Nanosecond {
-		return false
-	}
-
-	return true
+	return false
 }
 
 //NotEqualTo 比较两个时间是否不一样
 func (c *Carbon) NotEqualTo(carbon *Carbon) bool {
 
-	if c.Year == carbon.Year {
-		return false
+	if c.Timestamp() != carbon.Timestamp() {
+		return true
 	}
-	if c.Month == carbon.Month {
-		return false
-	}
-
-	if c.Day == carbon.Day {
-		return false
-	}
-
-	if c.Hour == carbon.Hour {
-		return false
-	}
-	if c.Minute == c.Minute {
-		return false
-	}
-
-	if c.Second == carbon.Second {
-		return false
-	}
-
-	if c.Millisecond == c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond == carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond == carbon.Nanosecond {
-		return false
-	}
-
-	return true
+	return false
 }
 
 //GreaterThan 比较时间是否比目标大
 func (c *Carbon) GreaterThan(carbon *Carbon) bool {
-	if c.Year <= carbon.Year {
-		return false
+	if c.Timestamp() > carbon.Timestamp() {
+		return true
 	}
-	if c.Month <= carbon.Month {
-		return false
-	}
-
-	if c.Day <= carbon.Day {
-		return false
-	}
-
-	if c.Hour <= carbon.Hour {
-		return false
-	}
-	if c.Minute <= c.Minute {
-		return false
-	}
-
-	if c.Second <= carbon.Second {
-		return false
-	}
-
-	if c.Millisecond <= c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond <= carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond <= carbon.Nanosecond {
-		return false
-	}
-	return true
+	return false
 }
 
 //GreaterThanOrEqualTo 比较时间是否比目标大于或者等于
 func (c *Carbon) GreaterThanOrEqualTo(carbon *Carbon) bool {
-	if c.Year < carbon.Year {
-		return false
+	if c.Timestamp() >= carbon.Timestamp() {
+		return true
 	}
-	if c.Month < carbon.Month {
-		return false
-	}
-
-	if c.Day < carbon.Day {
-		return false
-	}
-
-	if c.Hour < carbon.Hour {
-		return false
-	}
-	if c.Minute < c.Minute {
-		return false
-	}
-
-	if c.Second < carbon.Second {
-		return false
-	}
-
-	if c.Millisecond < c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond < carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond < carbon.Nanosecond {
-		return false
-	}
-	return true
+	return false
 }
 
 //LessThan 比较时间是否比目标小
 func (c *Carbon) LessThan(carbon *Carbon) bool {
-	if c.Year >= carbon.Year {
-		return false
+	if c.Timestamp() < carbon.Timestamp() {
+		return true
 	}
-	if c.Month >= carbon.Month {
-		return false
-	}
-
-	if c.Day >= carbon.Day {
-		return false
-	}
-
-	if c.Hour >= carbon.Hour {
-		return false
-	}
-	if c.Minute >= c.Minute {
-		return false
-	}
-
-	if c.Second >= carbon.Second {
-		return false
-	}
-
-	if c.Millisecond >= c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond >= carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond >= carbon.Nanosecond {
-		return false
-	}
-	return true
+	return false
 }
 
 //LessThanOrEqualTo 比较时间是否比目标小或者等于
 func (c *Carbon) LessThanOrEqualTo(carbon *Carbon) bool {
-	if c.Year > carbon.Year {
-		return false
+	if c.Timestamp() <= carbon.Timestamp() {
+		return true
 	}
-	if c.Month > carbon.Month {
-		return false
-	}
-
-	if c.Day > carbon.Day {
-		return false
-	}
-
-	if c.Hour > carbon.Hour {
-		return false
-	}
-	if c.Minute > c.Minute {
-		return false
-	}
-
-	if c.Second > carbon.Second {
-		return false
-	}
-
-	if c.Millisecond > c.Millisecond {
-		return false
-	}
-
-	if c.Microsecond > carbon.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond > carbon.Nanosecond {
-		return false
-	}
-	return true
+	return false
 }
 
 //Between 比较当前值是否是在 first 和second 之间
 func (c *Carbon) Between(first, second *Carbon) bool {
-	if c.Year < first.Year || c.Year > second.Year {
-		return false
-	}
-	if c.Month < first.Month || c.Month > second.Month {
+	if c.Timestamp() < first.Timestamp() || c.Timestamp() > second.Timestamp() {
 		return false
 	}
 
-	if c.Day < first.Day || c.Day > second.Day {
-		return false
-	}
-
-	if c.Hour < first.Hour || c.Hour > second.Hour {
-		return false
-	}
-	if c.Minute < c.Minute || c.Minute > second.Minute {
-		return false
-	}
-
-	if c.Second < first.Second || c.Second > second.Second {
-		return false
-	}
-
-	if c.Millisecond < c.Millisecond || c.Millisecond > second.Millisecond {
-		return false
-	}
-
-	if c.Microsecond < first.Microsecond || c.Microsecond > second.Microsecond {
-		return false
-	}
-
-	if c.Nanosecond < first.Nanosecond || c.Nanosecond > second.Nanosecond {
-		return false
-	}
 	return true
 }

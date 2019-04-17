@@ -1,6 +1,7 @@
 package carbon
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -240,6 +241,42 @@ func TestCarbon_EqualTo(t *testing.T) {
 			}
 			if got := c.EqualTo(tt.args.carbon); got != tt.want {
 				t.Errorf("Carbon.EqualTo() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCarbon_Between(t *testing.T) {
+	type args struct {
+		first  *Carbon
+		second *Carbon
+	}
+	tests := []struct {
+		name   string
+		fields *Carbon
+		args   args
+		want   bool
+	}{
+		{"", Now(), args{first: Yesterday(), second: Tomorrow()}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Carbon{
+				Year:        tt.fields.Year,
+				Day:         tt.fields.Day,
+				Hour:        tt.fields.Hour,
+				Minute:      tt.fields.Minute,
+				Second:      tt.fields.Second,
+				Millisecond: tt.fields.Millisecond,
+				Microsecond: tt.fields.Microsecond,
+				Nanosecond:  tt.fields.Nanosecond,
+				Month:       tt.fields.Month,
+				Week:        tt.fields.Week,
+				time:        tt.fields.time,
+			}
+			fmt.Println(c, tt.args.first, tt.args.second)
+			if got := c.Between(tt.args.first, tt.args.second); got != tt.want {
+				t.Errorf("Carbon.Between() = %v, want %v", got, tt.want)
 			}
 		})
 	}
