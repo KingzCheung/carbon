@@ -218,11 +218,11 @@ func TestCarbon_EqualTo(t *testing.T) {
 	}
 	tests := []struct {
 		name   string
-		fields fields
+		fields *Carbon
 		args   args
 		want   bool
 	}{
-		{"eq1", fields{Year: 2019, Day: 14, Hour: 20, Minute: 54, Second: 21, Microsecond: 0, Millisecond: 0, Nanosecond: 0, Month: time.Month(4)}, args{Create(2019, 4, 14, 20, 54, 21, time.Local)}, true},
+		{"neq", CreateFromDate(2019, 4, 14, time.Local), args{Create(2019, 4, 14, 0, 0, 0, time.Local)}, false}, //time is not equal
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -239,6 +239,8 @@ func TestCarbon_EqualTo(t *testing.T) {
 				Week:        tt.fields.Week,
 				time:        tt.fields.time,
 			}
+			fmt.Println(c.Timestamp(), tt.args.carbon.Timestamp())
+			fmt.Println(c, tt.args.carbon)
 			if got := c.EqualTo(tt.args.carbon); got != tt.want {
 				t.Errorf("Carbon.EqualTo() = %v, want %v", got, tt.want)
 			}
