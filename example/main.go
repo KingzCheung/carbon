@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/KingzCheung/carbon"
+	"github.com/kingzcheung/carbon"
 	"time"
 )
 

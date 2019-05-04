@@ -1,4 +1,4 @@
-module github.com/KingzCheung/carbon
+module github.com/kingzcheung/carbon
 
 go 1.12
 

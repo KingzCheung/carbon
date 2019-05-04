@@ -1,11 +1,11 @@
 # Carbon
 
-![GitHub](https://img.shields.io/github/license/kingzcheung/carbon.svg)  [![godoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/KingzCheung/carbon)  [![Build Status](https://travis-ci.org/KingzCheung/carbon.svg?branch=master)](https://travis-ci.org/KingzCheung/carbon)
+![GitHub](https://img.shields.io/github/license/kingzcheung/carbon.svg)  [![godoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/kingzcheung/carbon)  [![Build Status](https://travis-ci.org/kingzcheung/carbon.svg?branch=master)](https://travis-ci.org/kingzcheung/carbon)
 
 ### 安装
 
 ```
-go get github.com/KingzCheung/carbon
+go get github.com/kingzcheung/carbon
 ```
 
 ### 用法
