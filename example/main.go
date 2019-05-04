@@ -63,4 +63,8 @@ func main() {
 	carbon.Now().ToDateString()          //返回 "2006-01-02" 格式时间字符串
 	carbon.Now().ToFormattedDateString() //返回 "Jan 02,2006" 格式字符串
 
+	//比较前后
+	carbon.Now().After(carbon.Yesterday())
+	carbon.Now().Before(carbon.Yesterday())
+
 }
