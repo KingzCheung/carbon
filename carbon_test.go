@@ -283,3 +283,19 @@ func TestCarbon_Between(t *testing.T) {
 		})
 	}
 }
+
+func TestCarbon_After(t *testing.T) {
+	now := Now()
+	yesterday := Yesterday()
+	as := assert.New(t)
+
+	as.Equal(now.After(yesterday), true, "After error.")
+}
+
+func TestCarbon_Before(t *testing.T) {
+	now := Now()
+	yesterday := Yesterday()
+	as := assert.New(t)
+
+	as.Equal(now.Before(yesterday), false, "Before error.")
+}

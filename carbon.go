@@ -77,7 +77,7 @@ const (
 )
 
 //Now 获取现在时刻时间
-func Now() *Carbon {
+func Now(locale ...string) *Carbon {
 	t := time.Now()
 	return &Carbon{
 		Year:        t.Year(),
@@ -407,6 +407,14 @@ func (c *Carbon) subValToUnit(unit Unit, value int) error {
 	}
 	return nil
 }
+
+//func (c *Carbon)Locale(name string) *Carbon  {
+//	local,err:= time.LoadLocation(name)
+//	if err != nil {
+//		local = time.Local
+//	}
+//	c.time.Location()
+//}
 
 //Sub 从当前结构体减去 value 的 unit
 func (c *Carbon) Sub(unit Unit, value int) *Carbon {
@@ -841,4 +849,14 @@ func (c *Carbon) Between(first, second *Carbon) bool {
 	}
 
 	return true
+}
+
+//After 如果c代表的时间点在u之后，返回真；否则返回假。
+func (c *Carbon) After(u *Carbon) bool {
+	return c.time.After(u.time)
+}
+
+//Before 如果c代表的时间点在u之前，返回真；否则返回假。
+func (c *Carbon) Before(u *Carbon) bool {
+	return c.time.Before(u.time)
 }
