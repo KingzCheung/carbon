@@ -87,8 +87,8 @@ func TestCreateFromTime(t *testing.T) {
 
 func TestCarbon_CountDayForMonth(t *testing.T) {
 	as := assert.New(t)
-	nc := Now().CountDayForMonth()
-	as.Equal(nc, 30, "CountDayForMonth error.CountDayForMonth should be equal 30.")
+	nc := CreateFromDate(2019, 5, 4, time.Local).CountDayForMonth()
+	as.Equal(nc, 31, "CountDayForMonth error.CountDayForMonth should be equal 30.")
 }
 
 func TestCarbon_AddYears(t *testing.T) {
