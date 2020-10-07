@@ -299,3 +299,13 @@ func TestCarbon_Before(t *testing.T) {
 
 	as.Equal(now.Before(yesterday), false, "Before error.")
 }
+
+func TestWei(t *testing.T) {
+	fmt.Println(^-3 + 1)
+}
+
+func TestCarbon_DiffForHumans(t *testing.T) {
+	as := assert.New(t)
+	d := Now().SubDay().DiffForHumans()
+	as.Equal("1 day ago", d)
+}
