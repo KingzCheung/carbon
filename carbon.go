@@ -168,6 +168,22 @@ func CreateFromDate(year, month, day int, tz *time.Location) *Carbon {
 	}
 }
 
+func CreateFromGo(date time.Time) *Carbon {
+	return &Carbon{
+		Year:        date.Year(),
+		Month:       date.Month(),
+		Day:         date.Day(),
+		Hour:        date.Hour(),
+		Minute:      date.Minute(),
+		Second:      date.Second(),
+		Millisecond: date.Nanosecond() / 1000000,
+		Microsecond: date.Nanosecond() / 1000,
+		Nanosecond:  date.Nanosecond(),
+		Week:        date.Weekday(),
+		time:        date,
+	}
+}
+
 // CreateFromTime Create a Carbon instance from just a time.
 // The date portion is set to today.
 func CreateFromTime(hour, minute, second int, tz *time.Location) *Carbon {
