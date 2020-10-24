@@ -309,3 +309,19 @@ func TestCarbon_DiffForHumans(t *testing.T) {
 	d := Now().SubDay().DiffForHumans()
 	as.Equal("1 day ago", d)
 }
+
+func TestCarbon_IsYesterday(t *testing.T) {
+	yt := Yesterday()
+	now := Now()
+	as := assert.New(t)
+	as.Equal(yt.IsYesterday(), true)
+	as.Equal(false, now.IsYesterday())
+}
+
+func TestCarbon_IsToday(t *testing.T) {
+	yt := Yesterday()
+	now := Now()
+	as := assert.New(t)
+	as.Equal(yt.IsToday(), false)
+	as.Equal(true, now.IsToday())
+}

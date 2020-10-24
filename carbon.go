@@ -733,6 +733,18 @@ func (c *Carbon) IsLastMonth() bool {
 	return curMonth-c.Month == 1
 }
 
+// IsToday 判断是否是今天
+func IsToday(c *Carbon) bool { return c.IsToday() }
+func (c *Carbon) IsToday() bool {
+	return Now().Day == c.Day
+}
+
+// IsYesterday 判断是否是昨天
+func IsYesterday(c *Carbon) bool { return c.IsYesterday() }
+func (c *Carbon) IsYesterday() bool {
+	return Yesterday().Day == c.Day
+}
+
 // CurrentQuarter 返回当前季度
 func (c *Carbon) CurrentQuarter() Quarter {
 	switch {
